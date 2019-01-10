@@ -56,11 +56,11 @@ def distance(city_a, city_b):  # расстояние Левинштейна
         n, m = m, n
 
     current_row = range(n + 1)  # Keep current and previous row, not entire matrix
-    for i in range(1, m + 1):
-        previous_row, current_row = current_row, [i] + [0] * n
+    for n in range(1, m + 1):
+        previous_row, current_row = current_row, [n] + [0] * n
         for j in range(1, n + 1):
             add, delete, change = previous_row[j] + 1, current_row[j - 1] + 1, previous_row[j - 1]
-            if city_a[j - 1] != city_b[i - 1]:
+            if city_a[j - 1] != city_b[n - 1]:
                 change += 1
             current_row[j] = min(add, delete, change)
     return current_row[n]
@@ -76,6 +76,13 @@ def get_id(city_name, max_distance):  # получение id города из 
         return None
 
 
+def flat_cities(name, city_tree1):  # преобразование в плоский словарь
+    city_dict[city_tree1["name"]] = city_tree1["id"]
+    if len(city_tree1["areas"]) > 0:
+        for item in city_tree1["areas"]:
+            flat_cities(name, item)
+
+
 if __name__ == "__main__":
     BASE_URL = "https://api.hh.ru/areas"
     requests.get(BASE_URL)
@@ -84,14 +91,6 @@ if __name__ == "__main__":
     city_tree = response.json()
 
     city_dict = {}
-
-
-    def flat_cities(name, city_tree):  # преобразование в плоский словарь
-        city_dict[city_tree["name"]] = city_tree["id"]
-        if len(city_tree["areas"]) > 0:
-            for item in city_tree["areas"]:
-                flat_cities(name, item)
-
 
     for cont in city_tree:
         flat_cities("Московская область", cont)
